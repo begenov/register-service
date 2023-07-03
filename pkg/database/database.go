@@ -3,6 +3,8 @@ package database
 import (
 	"context"
 	"database/sql"
+
+	_ "github.com/lib/pq"
 )
 
 func Open(driver string, dsn string) (*sql.DB, error) {

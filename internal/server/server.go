@@ -14,7 +14,7 @@ type Server struct {
 func NewServer(cfg *config.ServerConfig, handler http.Handler) *Server {
 	return &Server{
 		httpServer: &http.Server{
-			Addr:           cfg.Port,
+			Addr:           ":" + cfg.Port,
 			ReadTimeout:    cfg.ReadTimeout,
 			WriteTimeout:   cfg.WriteTimeout,
 			MaxHeaderBytes: cfg.MaxHeaderMegabytes << 20,
