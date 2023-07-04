@@ -1,4 +1,4 @@
-package postgres
+package repository
 
 import (
 	"context"
@@ -52,6 +52,18 @@ func (r *RestaurantRepo) GetRestaurantByID(ctx context.Context, id int) (domain.
 	row := r.db.QueryRowContext(ctx, stmt, id)
 	var restaurant domain.Register
 	if err := row.Scan(&restaurant.Email, &restaurant.Phone, &restaurant.Password); err != nil {
+		return restaurant, err
+	}
+
+	return restaurant, nil
+}
+
+func (r *RestaurantRepo) GetRestaurantByRefreshToken(ctx context.Context, token string) (domain.Register, error) {
+	stmt := `SELECT id, email, phone, home_address, password_hash, refresh_token, expired_at FROM "restaurant" WHERE refresh_token = $1`
+	row := r.db.QueryRowContext(ctx, stmt, token)
+
+	var restaurant domain.Register
+	if err := row.Scan(&restaurant.ID, &restaurant.Email, &restaurant.Phone, &restaurant.Address, &restaurant.Password, &restaurant.RefreshToken, &restaurant.ExpiresAt); err != nil {
 		return restaurant, err
 	}
 

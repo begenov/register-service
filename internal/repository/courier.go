@@ -1,4 +1,4 @@
-package postgres
+package repository
 
 import (
 	"context"
@@ -57,4 +57,16 @@ func (r *CourierRepo) GetCourierByID(ctx context.Context, id int) (domain.Regist
 	}
 
 	return courier, nil
+}
+
+func (r *CourierRepo) GetCourierByRefreshToken(ctx context.Context, token string) (domain.Register, error) {
+	stmt := `SELECT id, email, phone, password_hash, refresh_token, expired_at FROM courier WHERE refresh_token = $1`
+	row := r.db.QueryRowContext(ctx, stmt, token)
+
+	var user domain.Register
+	if err := row.Scan(&user.ID, &user.Email, &user.Phone, &user.Password, &user.RefreshToken, &user.ExpiresAt); err != nil {
+		return user, err
+	}
+
+	return user, nil
 }

@@ -1,4 +1,4 @@
-package postgres
+package repository
 
 import (
 	"context"
@@ -88,6 +88,24 @@ func TestNewRestaurantRepo(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestRestaurantRepo_GetRestaurantByRefreshToken(t *testing.T) {
+	refresh_token := util.RandomString(10)
+	expiresAt := time.Now()
+	id := 1
+	repo := RestaurantRepo{
+		db: db,
+	}
+
+	err := repo.SetSession(context.Background(), refresh_token, expiresAt, id)
+	require.NoError(t, err)
+
+	r, err := repo.GetRestaurantByRefreshToken(context.Background(), refresh_token)
+	require.NoError(t, err)
+	require.NotEmpty(t, r)
+
+	require.Equal(t, r.ID, id)
 }
 
 func getRestaurant() domain.Register {

@@ -1,4 +1,4 @@
-package postgres
+package repository
 
 import (
 	"context"
@@ -94,4 +94,22 @@ func TestCourierRepo_GetCourierByID(t *testing.T) {
 			require.NotEmpty(t, got)
 		})
 	}
+}
+
+func TestCourierRepo_GetCourierByRefreshToken(t *testing.T) {
+	refresh_token := util.RandomString(10)
+	expiresAt := time.Now()
+	id := 1
+	repo := CourierRepo{
+		db: db,
+	}
+
+	err := repo.SetSession(context.Background(), refresh_token, expiresAt, id)
+	require.NoError(t, err)
+
+	r, err := repo.GetCourierByRefreshToken(context.Background(), refresh_token)
+	require.NoError(t, err)
+	require.NotEmpty(t, r)
+
+	require.Equal(t, r.ID, id)
 }
