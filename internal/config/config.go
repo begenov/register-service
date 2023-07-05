@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/subosito/gotenv"
+	"golang.org/x/crypto/bcrypt"
 )
 
 const (
@@ -14,6 +15,7 @@ const (
 	defaultHTTPMaxHeaderMegabytes = 1
 	defaultAccessTokenTTL         = 15 * time.Minute
 	defaultRefreshTokenTTL        = 24 * time.Hour * 30
+	cost                          = bcrypt.DefaultCost
 )
 
 type Config struct {
@@ -38,6 +40,7 @@ type ServerConfig struct {
 	ReadTimeout        time.Duration
 	WriteTimeout       time.Duration
 	MaxHeaderMegabytes int
+	Cost               int
 }
 
 func NewConfig() (*Config, error) {
@@ -65,6 +68,7 @@ func NewConfig() (*Config, error) {
 			WriteTimeout:       defaultHTTPRWTimeout,
 			ReadTimeout:        defaultHTTPRWTimeout,
 			MaxHeaderMegabytes: defaultHTTPMaxHeaderMegabytes,
+			Cost:               cost,
 		},
 	}, nil
 }
