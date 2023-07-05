@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package pb;
+
+import "register.proto";
+
+option go_package = "github.com/begenov/register-service/pb";
+
+service Register {
+    rpc SignUp(RequestRegister) returns (Response) {
+
+    }
+
+    rpc SignIn(RequestSignIn) returns (ResponseToken) {
+        
+    }
+
+    rpc RefreshToken(RequestToken) returns (ResponseToken) {
+    
+    }
+}
