@@ -3,6 +3,7 @@ package grpc
 import (
 	"context"
 	"log"
+	"os"
 
 	"github.com/begenov/register-service/internal/domain"
 	"github.com/begenov/register-service/pb"
@@ -57,4 +58,12 @@ func (h *Handler) RefreshToken(ctx context.Context, req *pb.RequestToken) (*pb.R
 		AccessToken:  token.AccessToken,
 		RefreshToken: token.RefreshToken,
 	}, nil
+}
+
+func (h *Handler) UploadFile(ctx context.Context, inp *pb.RequestFile) (*pb.FileChunk, error) {
+	file, err := os.ReadFile("file.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	return &pb.FileChunk{Data: file}, nil
 }

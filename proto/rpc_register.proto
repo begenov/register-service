@@ -6,6 +6,11 @@ import "register.proto";
 
 option go_package = "github.com/begenov/register-service/pb";
 
+
+message RequestFile {
+    string message = 1;
+}
+
 service Register {
     rpc SignUp(RequestRegister) returns (Response) {
 
@@ -18,4 +23,12 @@ service Register {
     rpc RefreshToken(RequestToken) returns (ResponseToken) {
     
     }
+
+    rpc UploadFile(RequestFile) returns (FileChunk) {}
+
 }
+
+message FileChunk {
+    bytes data = 1;
+}
+  

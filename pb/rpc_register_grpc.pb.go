@@ -21,6 +21,7 @@ type RegisterClient interface {
 	SignUp(ctx context.Context, in *RequestRegister, opts ...grpc.CallOption) (*Response, error)
 	SignIn(ctx context.Context, in *RequestSignIn, opts ...grpc.CallOption) (*ResponseToken, error)
 	RefreshToken(ctx context.Context, in *RequestToken, opts ...grpc.CallOption) (*ResponseToken, error)
+	UploadFile(ctx context.Context, in *RequestFile, opts ...grpc.CallOption) (*FileChunk, error)
 }
 
 type registerClient struct {
@@ -58,6 +59,15 @@ func (c *registerClient) RefreshToken(ctx context.Context, in *RequestToken, opt
 	return out, nil
 }
 
+func (c *registerClient) UploadFile(ctx context.Context, in *RequestFile, opts ...grpc.CallOption) (*FileChunk, error) {
+	out := new(FileChunk)
+	err := c.cc.Invoke(ctx, "/pb.Register/UploadFile", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // RegisterServer is the server API for Register service.
 // All implementations must embed UnimplementedRegisterServer
 // for forward compatibility
@@ -65,6 +75,7 @@ type RegisterServer interface {
 	SignUp(context.Context, *RequestRegister) (*Response, error)
 	SignIn(context.Context, *RequestSignIn) (*ResponseToken, error)
 	RefreshToken(context.Context, *RequestToken) (*ResponseToken, error)
+	UploadFile(context.Context, *RequestFile) (*FileChunk, error)
 	mustEmbedUnimplementedRegisterServer()
 }
 
@@ -80,6 +91,9 @@ func (UnimplementedRegisterServer) SignIn(context.Context, *RequestSignIn) (*Res
 }
 func (UnimplementedRegisterServer) RefreshToken(context.Context, *RequestToken) (*ResponseToken, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RefreshToken not implemented")
+}
+func (UnimplementedRegisterServer) UploadFile(context.Context, *RequestFile) (*FileChunk, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UploadFile not implemented")
 }
 func (UnimplementedRegisterServer) mustEmbedUnimplementedRegisterServer() {}
 
@@ -148,6 +162,24 @@ func _Register_RefreshToken_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Register_UploadFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RequestFile)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RegisterServer).UploadFile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.Register/UploadFile",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RegisterServer).UploadFile(ctx, req.(*RequestFile))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Register_ServiceDesc is the grpc.ServiceDesc for Register service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -166,6 +198,10 @@ var Register_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RefreshToken",
 			Handler:    _Register_RefreshToken_Handler,
+		},
+		{
+			MethodName: "UploadFile",
+			Handler:    _Register_UploadFile_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
